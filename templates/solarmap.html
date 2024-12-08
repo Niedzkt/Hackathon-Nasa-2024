@@ -1,0 +1,35 @@
+{%extends "base.html" %}
+
+{% block content %}
+
+
+<div id="map"></div>
+
+ <script>
+	 var map = L.map('map').setView([50.86, 20.629], 13);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+</script>
+
+	<script>
+		var popup = L.popup()
+
+		function onMapClick(e){
+			popup
+			.setLatLng(e.latlng)
+			.setContent("Dane geograficzne: " + e.latlng.toString())
+			.openOn(map);
+			console.log(e.latlng.toString())
+			var latlng_table = e.latlng;
+			console.log(latlng_table)
+			return latlng_table;
+		}
+		
+
+		map.on('click', onMapClick);
+	</script>
+
+	{% endblock %}

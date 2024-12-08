@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Better Sun - Map View</title>
+  <link rel="stylesheet" href="./static/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+ <!-- Make sure you put this AFTER Leaflet's CSS -->
+ <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+ <link rel="stylesheet" href="/static/style.css"/>
+<script src="/static/leaflet-heat.js"></script>
+
+
+</head>
+
+<body>
+<header>
+  <div class="logo">
+    <img src="./static/logo.png" alt="Better Sun Logo">
+    <h1>Better Sun</h1>
+  </div>
+  <nav>
+<ul>
+      <li><button onclick="location.href='{{url_for('landing_page')}}'">Home</button></li>
+      <li><button onclick="location.href='{{url_for('map_route')}}'">Map View</button></li>
+      <li><button onclick="location.href='{{url_for('about_page')}}'">About</button></li>
+    </ul>
+  </nav>
+</header>
+
+<section id="mapView">
+  <div class="map-container">
+    <img src="./static/log2.png" alt="Better Sun Map Logo" class="map-logo">
+    <div class="map-placeholder">
+      
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+<script src="https://unpkg.com/@turf/turf/turf.min.js"></script>
+
+<div id="map"></div>
+
+<script>
+    var map = L.map('map').setView([50.86, 20.629], 13);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    var popup = L.popup();
+
+    // Function to handle polygon submission and generate heatmap
+    function genHeatMap() {
+        console.log("Generating heatmap for polygon:", polygonPoints);
+
+        // Send polygon points to the backend
+        fetch('/map/solar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                polygon_points: polygonPoints.map(function(latlng) {
+                    return { lat: latlng.lat, lng: latlng.lng };
+                })
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Backend response:', data);
+
+            if (!data.heat_array || data.heat_array.length === 0) {
+                console.error('No heat points received');
+                return;
+            }
+
+            var heatArray = data.heat_array;
+
+            // Add heatmap layer
+            var heat = L.heatLayer(heatArray, {
+                radius: 25,
+                blur: 55,
+                maxZoom: 17,
+            }).addTo(map);
+
+            // Optionally draw circles around the points
+            
+        })}
+
+    var startPoint = null;
+    var rectangle = null;
+    var drawing = false;  // Flag to check if drawing is in progress
+
+    var polygonPoints = [];  // List of points for the polygon
+    var polygon = null;  // Reference to the drawn polygon
+
+    var markers = [];  // List of markers on the map
+
+    // Function to add markers with popups for each point
+    function addMarker(latlng) {
+        var marker = L.marker(latlng).addTo(map);
+        marker.bindPopup('Lat: ' + latlng.lat.toFixed(6) + ', Lng: ' + latlng.lng.toFixed(6)).openPopup();
+        markers.push(marker);  // Add marker to the list to remove later
+    }
+
+    // Function to clear all markers from the map
+    function clearMarkers() {
+        markers.forEach(function(marker) {
+            map.removeLayer(marker);
+        });
+        markers = [];  // Clear the list of markers
+    }
+
+    function updatePolygon() {
+        if (polygon) {
+            map.removeLayer(polygon);
+        }
+
+        // Draw polygon if we have at least 3 points
+        if (polygonPoints.length > 2) {
+            polygon = L.polygon(polygonPoints, { color: 'blue', weight: 0.5 }).addTo(map);
+        }
+    }
+
+    // Event mousedown - start holding the right mouse button
+    map.on('mousedown', function(e) {
+        if (e.originalEvent.button === 2 && e.originalEvent.ctrlKey) {  // Check if it's right-click with Ctrl
+            startPoint = e.latlng;
+            drawing = true;  // Start drawing
+
+            // If a rectangle exists, remove it
+            if (rectangle) {
+                map.removeLayer(rectangle);
+                rectangle = null;  // Reset rectangle
+                clearMarkers();
+            }
+
+            // Listen for mouse movement (dynamic drawing)
+            map.on('mousemove', onMouseMove);
+        }
+    });
+
+    // Event mousemove - draw rectangle while moving the cursor
+    function onMouseMove(e) {
+        if (drawing && startPoint) {
+            var currentPoint = e.latlng;
+
+            // Define rectangle coordinates from startPoint to currentPoint
+            var bounds = L.latLngBounds(startPoint, currentPoint);
+
+            // If the rectangle exists, update its bounds
+            if (rectangle) {
+                rectangle.setBounds(bounds);
+            } else {
+                // Create a new rectangle
+                rectangle = L.rectangle(bounds, { color: "blue", weight: 0.5 }).addTo(map);
+            }
+            clearMarkers();  // Remove previous markers
+            addMarker(bounds.getNorthWest());  // Northwest corner
+            addMarker(bounds.getNorthEast());  // Northeast corner
+            addMarker(bounds.getSouthWest());  // Southwest corner
+            addMarker(bounds.getSouthEast());  // Southeast corner
+        }
+    }
+
+    // Event mouseup - stop holding the right mouse button
+    map.on('mouseup', function(e) {
+        if (e.originalEvent.button === 2 && drawing) {  // Check if it's right-click and drawing is in progress
+            map.off('mousemove', onMouseMove);  // Stop tracking mouse movement
+            drawing = false;  // Finished drawing
+            startPoint = null;  // Reset start point
+        }
+    });
+
+    map.on('click', function(e) {
+        if (!drawing) {  // Add points only if we're not drawing a rectangle
+            var point = e.latlng;
+            polygonPoints.push(point);  // Add point to the list of vertices
+
+            // If the polygon already exists, remove it before drawing a new one
+            if (polygon) {
+                map.removeLayer(polygon);
+            }
+
+            if(rectangle) {
+                map.removeLayer(rectangle);
+                rectangle = null;
+                clearMarkers();
+            }
+
+            // Draw a new polygon if we have at least 3 points
+            if (polygonPoints.length > 2) {
+                polygon = L.polygon(polygonPoints, { color: 'blue', weight: 0.5 }).addTo(map);
+            }
+            addMarker(point);
+        }
+    });
+
+    map.on('contextmenu', function(e) {  // Use contextmenu to react to the right mouse button
+        // Remove the existing polygon and reset the list of points
+        if (polygon) {
+            map.removeLayer(polygon);
+            polygon = null;
+            polygonPoints = [];
+            clearMarkers();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'z') {  // Check if Ctrl+Z is pressed
+            if (polygonPoints.length > 0) {
+                polygonPoints.pop();  // Remove the last point from the list
+                updatePolygon();  // Update the polygon on the map
+
+                // Remove the last marker
+                var lastMarker = markers.pop();
+                if (lastMarker) {
+                    lastMarker.remove();  // Remove the last marker from the map
+                }
+
+                console.log("Last vertex undone.");
+            }
+        }
+        if (e.key === 'Enter') {  // Check if Enter is pressed
+            console.log("Enter pressed - generating heatmap.");
+
+            // Generate heatmap for the polygon
+            if (polygonPoints.length > 2) {
+                genHeatMap();  // Generate heatmap based on the polygon
+            } else {
+                console.error("Polygon must have at least 3 points.");
+            }
+        }
+    });
+
+    map.getContainer().oncontextmenu = function (e) {
+        e.preventDefault();  // Prevent the context menu from appearing
+    };
+
+</script>
+
+
+
+
+    </div>
+    <div class="floating-window" id="draggable">
+      <h3>Map Tools</h3>
+      <p>Instruction:</p>
+	<p>LMB: Polygon Mode - every click creates new vertex.</p>
+	<p>PMB: Clear Polygon and every of vertex.</p>
+	<p>Ctrl + z: Delete last created vertex.</p>
+	<p>ENTER: Submit your polygon, sending request for data and creating heatmap with best places for your solar panels (depend at your internet speed and how big the area is, wait around 10 seconds to 5 minutes)</p>
+      <button class="map-tool-button">Tool 1</button>
+      <button class="map-tool-button">Tool 2</button>
+      <button class="map-tool-button">Tool 3</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2024 Better Sun. All rights reserved.</p>
+</footer>
+
+<script>
+  const draggable = document.getElementById("draggable");
+  let isDragging = false;
+  let offsetX, offsetY;
+
+  draggable.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    offsetX = e.clientX - draggable.getBoundingClientRect().left;
+    offsetY = e.clientY - draggable.getBoundingClientRect().top;
+    draggable.style.cursor = "grabbing";
+    draggable.style.position = "absolute";
+    draggable.style.zIndex = "1000";
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (isDragging) {
+      e.preventDefault();
+      draggable.style.left = `${e.clientX - offsetX}px`;
+      draggable.style.top = `${e.clientY - offsetY}px`;
+    }
+  });
+
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+    draggable.style.cursor = "grab";
+  });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,167 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 40px;
+  margin-right: 10px;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+}
+
+nav ul li {
+  margin-left: 20px;
+}
+
+nav ul li button {
+  background: #f39c12;
+  border: none;
+  color: #fff;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+nav ul li button:hover {
+  background: #e67e22;
+}
+
+#landing {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #ffdf85, #f39c12);
+}
+
+.landing-content {
+  text-align: center;
+}
+
+.sun-animation {
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, #f9d71c 0%, #f39c12 60%, transparent 70%);
+  border-radius: 50%;
+  animation: moveSun 3s infinite alternate ease-in-out;
+  margin: 40px auto 0;
+}
+
+@keyframes moveSun {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-40px);
+  }
+}
+
+#mapView {
+  padding: 40px 20px;
+  background: #eaeaea;
+}
+
+.map-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+.map-logo {
+  align-self: flex-end;
+  width: 80px;
+  margin-bottom: 10px;
+}
+
+.map-placeholder {
+  width: 80%;
+  height: 600px;
+  background: #e6e6e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #ccc;
+  margin: 0 auto;
+}
+
+.floating-window {
+  width: 25%;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  cursor: grab;
+}
+
+.map-tool-button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f39c12;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.map-tool-button:hover {
+  background-color: #e67e22;
+}
+
+#about {
+  padding: 60px 20px;
+  background: linear-gradient(to bottom right, #f4f4f4, #ffdf85);
+  text-align: center;
+}
+
+.about-logo {
+  width: 100px;
+  margin-bottom: 20px;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  margin-top: 40px;
+}
+
+footer p {
+  font-size: 0.9em;
+}

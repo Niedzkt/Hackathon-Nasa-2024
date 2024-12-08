@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Better Sun - About</title>
+  <link rel="stylesheet" href="./static/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<header>
+  <div class="logo">
+    <img src="./static/logoabout.svg" alt="Better Sun Logo">
+    <h1>Better Sun</h1>
+  </div>
+  <nav>
+    <ul>
+      <li><button onclick="location.href='{{url_for('landing_page')}}'">Home</button></li>
+      <li><button onclick="location.href='{{url_for('map_route')}}'">Map View</button></li>
+      <li><button onclick="location.href='{{url_for('about_page')}}'">About</button></li>
+    </ul>
+
+  </nav>
+</header>
+
+<section id="about">
+  <div class="about-content">
+    <img src="./static/logo.png" alt="Better Sun Logo" class="about-logo">
+    <h2>About Better Sun</h2>
+    <p>
+Our project is a web application that allows users to check the solar exposure of designated areas.
+
+It assists in selecting the most optimal locations for solar panels by displaying a heatmap that shows where the panels will operate most efficiently and generate the maximum amount of energy in kilowatt-hours (kWh). Additionally, the application helps users analyze how temperature or sunlight exposure on a given area might change due to environmental factors, ultimately aiding in better energy management in both residential and commercial environments.
+
+We aim for everyone—whether they are homeowners or solar company operators—to optimize their green energy production as effectively as possible, which will have a significant impact on mitigating environmental changes caused by inefficient energy management.</p>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2024 Better Sun. All rights reserved.</p>
+</footer>
+</body>
+
+</html>
