@@ -1,0 +1,13 @@
+Hackathon-NASA project 2024
+
+Solar Calculation Heat Map for Solar Panels.
+
+1. Extract all files into one folder. Don't change treemap/sitemap of the folder, it could break the application.
+2. Install Python for your system and pip. Add them to the PATH.
+3. Open cmd, move to your folder with extracted application and start virtual environment.
+- Linux: source venv/bin/active or source venv/bin/activate
+- Windows: .\venv\Scripts\activate 
+4. After you activated your venv (virtual environment) run this command to install dependecies and check if they are installed: pip install -r requirements.txt
+5. If everything works well, run the last command to run the application: python app.py
+6. Open your browser and go to url http://127.0.0.1:5000
+7. Congratulations, now you can check your power of your place for solar panels.
